@@ -1,0 +1,76 @@
+import {app, BrowserWindow} from 'electron';
+import path from 'path';
+import url from 'url';
+import fs from 'fs';
+
+import Store from 'electron-store';
+const store = new Store({cwd: 'envConfig'});
+
+import './bridge';
+
+let win;
+function createWindow() {
+    win = new BrowserWindow({width: 800, height: 600});
+    win.loadURL(url.format({
+        pathname: path.join(__dirname, '../render/index.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+
+    win.on('closed', () => {
+        win = null;
+    });
+}
+
+app.on('ready', createWindow);
+
+
+app.on('window-all-closed', () => {
+    if (process.platform != 'darwin') {
+        app.quit();
+    }
+});
+
+app.on('activate', () => {
+    if (win === null) {
+        createWindow();
+    }
+});
+
+{
+    if(!store.get('env-list')) {
+        fs.readFile('/etc/hosts', 'utf8', (err, data) => {
+            if (err) {
+
+            }
+            store.set('env-list', [{
+                name: 'COMMON',
+                checked: true,
+                content: `# COMMON`,
+                isSystem: true,
+                canDelete: false
+            }, {
+                name: 'My hosts',
+                checked: true, 
+                content: `# My hosts
+${data}`
+            }, {
+                name: 'backup',
+                checked: false,
+                canEdit: false,
+                canDelete: false,
+                isSystem: true,
+                content: `# backup
+${data}`,
+            }, {
+                name: 'Host Names',
+                showCheck: false,
+                canDelete: false,
+                checked: true,
+                isSystem: true,
+                content: `# Host Names`
+            }]);
+        })
+        
+    }
+}
