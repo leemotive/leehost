@@ -77,7 +77,6 @@ function calHost() {
     for(let env of envlists) {
         if (env.showCheck !== false && env.checked !== false) {
             if (env.isSystem || !env.extendNames) {
-                console.log('system extendNames');
                 contents.push(env.content);
             } else {
                 let hosts = env.content.split(os.EOL);
@@ -90,7 +89,6 @@ function calHost() {
                         break;
                     }
                 }
-                console.log('system extendNames' + index);
 
                 hosts.splice(++index, 0, nameArr.map(name => {
                     if (/^\s*#/.test(name)) {
@@ -98,7 +96,6 @@ function calHost() {
                     }
                     return `${env.ip} ${name}`;
                 }).join(os.EOL));
-                console.log('hosts ' + hosts.join(os.EOL));
                 contents.push(hosts.join(os.EOL));
             }
         }
