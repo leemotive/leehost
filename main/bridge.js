@@ -1,12 +1,20 @@
-import {ipcMain} from 'electron';
-import fs from 'fs';
-import os from 'os';
-import ChildProcess from 'child_process';
+//import {ipcMain} from 'electron';
+//import fs from 'fs';
+//import os from 'os';
+//import ChildProcess from 'child_process';
+
+const {ipcMain} = require('electron');
+const fs = require('fs');
+const os = require('os');
+const ChildProcess = require('child_process');
 
 const {exec} = ChildProcess;
 
-import Store from 'electron-store';
+//import Store from 'electron-store';
+const Store = require('electron-store');
 const store = new Store({cwd: 'envConfig'});
+
+
 
 let sudoPwd = undefined;
 let sender = null;

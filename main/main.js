@@ -1,12 +1,19 @@
-import {app, BrowserWindow} from 'electron';
-import path from 'path';
-import url from 'url';
-import fs from 'fs';
+//import {app, BrowserWindow} from 'electron';
+//import path from 'path';
+//import url from 'url';
+//import fs from 'fs';
 
-import Store from 'electron-store';
+const {app, BrowserWindow} = require('electron');
+const path = require('path');
+const url = require('url');
+const fs = require('fs');
+
+//import Store from 'electron-store';
+const Store = require('electron-store');
 const store = new Store({cwd: 'envConfig'});
 
-import './bridge';
+//import './bridge';
+require('./bridge');
 
 let win;
 function createWindow() {
