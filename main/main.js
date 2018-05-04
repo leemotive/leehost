@@ -3,7 +3,7 @@
 //import url from 'url';
 //import fs from 'fs';
 
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, Menu} = require('electron');
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
@@ -14,6 +14,7 @@ const store = new Store({cwd: 'envConfig'});
 
 //import './bridge';
 require('./bridge');
+
 
 let win;
 function createWindow() {
@@ -29,7 +30,10 @@ function createWindow() {
     });
 }
 
-app.on('ready', createWindow);
+app.on('ready', () => {
+    createWindow();
+    initMenu();
+});
 
 
 app.on('window-all-closed', () => {
@@ -80,4 +84,39 @@ ${data}`,
         })
         
     }
+}
+
+
+const template = [{
+        label: 'LeeHost',
+        submenu: [{
+            label: 'About',
+            click: () => {
+                win.webContents.send('showAbout');
+            }
+        }]
+    }, {
+        label: 'Edit',
+        submenu: [{
+            label: 'Cut',
+            role: 'cut'
+        }, {
+            label: 'Copy',
+            role: 'copy'
+        }, {
+            label: 'Paste',
+            role: 'paste'
+        }, {
+            label: 'Select All',
+            role: 'selectall'
+        }/* , {
+            label: 'DevTool',
+            role: 'toggledevtools'
+        } */]
+    }
+]
+
+function initMenu () {
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
 }

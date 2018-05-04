@@ -13,8 +13,7 @@ const About = {template: '<div>About</div>'};
 
 const routes = [
     {path: '/', component: Home},
-    {path: '/home', component: Home},
-    {path: '/bar', component: About}
+    {path: '/home', component: Home}
 ]
 
 const router = new VueRouter({routes});

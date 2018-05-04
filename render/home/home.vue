@@ -12,7 +12,13 @@
 
         modal(v-model="sudoPwdModel.visible" title="Input your sudo password" @on-ok="inputSudoPwdOk" @on-cancel="inputSudoPwdCancel" width="400" class="sudo-pwd-modal")
             |Password
-            i-input(v-model="sudoPwdModel.pwd" class="sudo-pwd-input")
+            i-input(v-model="sudoPwdModel.pwd" class="sudo-pwd-input" type="password")
+        modal(v-model="showAbout" v-bind:closable="false" width="250")
+            .about
+                img.logo(:src="logoSrc")
+                div LeeHost(1.0.0)
+            div(slot="footer")
+                i-button(type="ghost" @click="hideAbout") Close
 </template>
 
 
@@ -50,6 +56,8 @@ export default {
                 visible: false,
                 pwd: ''
             },
+            showAbout: false,
+            logoSrc: require('../../assets/app.png'),
             
         }
     },
@@ -108,6 +116,9 @@ export default {
         },
         inputSudoPwdCancel() {
             ipcRenderer.send('sudoPwdCancel');
+        },
+        hideAbout() {
+            this.showAbout = false;
         }
     },
     mounted() {
@@ -119,6 +130,10 @@ export default {
             this.sudoPwdModel = {
                 visible: true
             }
+        });
+
+        ipcRenderer.on('showAbout', () => {
+            this.showAbout = true;
         });
     }
 }
@@ -172,6 +187,13 @@ export default {
     }
     .sudo-pwd-input {
         margin-left: 15px;
+    }
+    .about {
+        text-align: center;
+        .logo {
+            width: 100px;
+            height: 100px;
+        }
     }
 </style>
 <style lang="postcss">

@@ -99,7 +99,7 @@ function calHost() {
                 }
 
                 hosts.splice(++index, 0, nameArr.map(name => {
-                    if (/^\s*#/.test(name)) {
+                    if (/^\s*#/.test(name) || /^\s*$/.test(name)) {
                         return name;
                     }
                     return `${env.ip} ${name}`;

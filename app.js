@@ -1,6 +1,6 @@
-/* console.log('app.js ')
+//console.log('app.js ')
 
-require('@babel/register')({
+/* require('@babel/register')({
     presets: [
         ['@babel/preset-env']
     ]
