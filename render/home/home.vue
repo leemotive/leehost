@@ -201,7 +201,6 @@ export default {
             height: 100%;
         }
     }
-
     .sudo-pwd-modal {
         width: 400px;
         .ivu-modal-body {

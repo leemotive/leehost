@@ -249,7 +249,7 @@ export default {
             margin: 0 10px 0 15px;
         }
     }
-    
+
     .name {
         display: flex;
         line-height: 32px;
@@ -266,7 +266,7 @@ export default {
 
     .delete-host {
         margin-top: 10px;
-        
+
         .delete-btn {
             color: #ed3f14;
             border-color: #ed3f14;
@@ -278,7 +278,7 @@ export default {
 </style>
 
 <style lang="postcss">
-    
-    
+
+
 </style>
 
