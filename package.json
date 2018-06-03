@@ -8,7 +8,13 @@
     "dev": "webpack --mode development",
     "start": "electron .",
     "build": "webpack --mode production",
-    "package": "electron-packager ./ --out=package --platform=darwin --arch=x64 --overwrite --asar=true --prune  --icon=./assets/app.icns --ignore=node_modules/.bin --ignore=.git --app-version=1.0.0 --build-version=2563"
+    "package": "electron-packager ./ --out=package --platform=darwin --arch=x64 --overwrite --asar=true --prune  --icon=./assets/app.icns --ignore=node_modules/.bin --ignore=.git --app-version=1.0.0 --build-version=2563",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,vue}": [
+      "eslint"
+    ]
   },
   "repository": {
     "type": "git",
@@ -18,12 +24,17 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/leemotive/leehost#readme",
   "devDependencies": {
+    "babel-eslint": "^8.2.3",
     "babel-loader": "^8.0.0-beta.2",
     "babel-plugin-import": "^1.7.0",
     "css-loader": "^0.28.11",
     "electron": "^1.8.4",
     "electron-packager": "^12.0.0",
+    "eslint": "^4.19.1",
+    "eslint-plugin-html": "^4.0.3",
+    "eslint-plugin-vue": "^4.5.0",
     "file-loader": "^1.1.11",
+    "lint-staged": "^7.1.3",
     "postcss-cssnext": "^3.1.0",
     "postcss-import": "^11.1.0",
     "postcss-loader": "^2.1.3",

@@ -1,0 +1,38 @@
+{
+    "extends": "plugin:vue/recommended",
+    "globals": {
+    },
+    "env": {
+        "node": true,
+        "browser": true,
+        "commonjs": true,
+        "es6": true
+    },
+    "parserOptions": {
+        "parser": "babel-eslint",
+        "ecmaVersion": 9,
+        "sourceType": "module",
+        "ecmaFeatures": {
+            "jsx": true
+        }
+    },
+    "rules": {
+        "indent": ["error", 4, {"SwitchCase": 1}],
+        "comma-dangle": ["error", "only-multiline"],
+        "no-underscore-dangle": ["error", { "allow": ["_this"] }],
+        "max-len": "off",
+        "no-unused-expressions": ["error", { "allowShortCircuit": true }],
+        "eqeqeq": "off",
+        "no-unused-vars": ["error", {"vars": "all", "args": "none"}],
+        "quotes": ["error", "single", {"allowTemplateLiterals": true}],
+        "no-trailing-spaces": "error",
+        "object-curly-spacing": ["error", "always"],
+        "space-before-function-paren": ["error", "never"],
+        "space-infix-ops": ["error", {"int32Hint": true}],
+        "space-unary-ops": ["error", {"words": true, "nonwords": false}],
+        "spaced-comment": ["error", "always"],
+        "switch-colon-spacing": ["error", {"after": true, "before": false}],
+        "curly": "error"        
+    },
+    "plugins": ["vue"]
+}

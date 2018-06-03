@@ -27,9 +27,9 @@
 
 <script>
 import Store from 'electron-store';
-const store = new Store({cwd: 'envConfig'});
+const store = new Store({ cwd: 'envConfig' });
 
-import {ipcRenderer} from 'electron';
+import { ipcRenderer } from 'electron';
 
 import ISwitch from 'iview/src/components/switch';
 import IInput from 'iview/src/components/input';
@@ -46,7 +46,7 @@ function storeEnv(envs, tryToApply) {
 
 function debounce(fn, delay) {
     let ti = 0;
-    return function (...args) {
+    return function(...args) {
         clearTimeout(ti);
         ti = setTimeout(() => {
             fn.apply(this, args);
@@ -83,15 +83,24 @@ export default {
     watch: {
         envs: {
             handler(val) {
-                this.storeEnvList({val});
+                this.storeEnvList({ val });
             },
             deep: true
         }
-        
 
     },
+    mounted() {
+        this.$emit('changeSwitch', this.envs[0]);
+
+        const content = ipcRenderer.sendSync('callSystemHost');
+        this.envs[0].content = content;
+
+        ipcRenderer.on('applyHostSucceed', (event, args) => {
+            this.envs[0].content = args;
+        });
+    },
     methods: {
-        storeEnvList({val = this.envs} = {}) {
+        storeEnvList({ val = this.envs } = {}) {
             deStore(val.slice(1));
         },
         checkHost(env) {
@@ -122,7 +131,7 @@ export default {
         saveHost() {
             this.$refs.hostModal.buttonLoading = false;
             if (this.hostModal.editMode) {
-                let [env1, env2] = this.envs.filter(({name}) => name === this.hostModal.name || name === this.hostModal.originalName);
+                let [env1, env2] = this.envs.filter(({ name }) => name === this.hostModal.name || name === this.hostModal.originalName);
                 if (env2) {
                     this.$Message.error({
                         content: `${this.hostModal.name}已经存在，名字不可重复`,
@@ -140,7 +149,7 @@ export default {
                     this.storeEnvList();
                 }
             } else {
-                const env = this.envs.find(({name}) => name === this.hostModal.name);
+                const env = this.envs.find(({ name }) => name === this.hostModal.name);
                 if (env) {
                     this.$Message.error({
                         content: `${this.hostModal.name}已经存在，名字不可重复`,
@@ -167,21 +176,11 @@ export default {
             }
         },
         deleteHost() {
-            this.envs = this.envs.filter(({name}) => name !== this.hostModal.name);
+            this.envs = this.envs.filter(({ name }) => name !== this.hostModal.name);
             this.hostModal = {
                 visible: false
             };
         }
-    },
-    mounted() {
-        this.$emit('changeSwitch', this.envs[0]);
-        
-        const content = ipcRenderer.sendSync('callSystemHost');
-        this.envs[0].content = content;
-
-        ipcRenderer.on('applyHostSucceed', (event, args) => {
-            this.envs[0].content = args;
-        });
     }
 }
 </script>

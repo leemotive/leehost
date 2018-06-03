@@ -24,7 +24,7 @@
 
 <script>
 import EnvList from '../env-list';
-import {codemirror} from 'vue-codemirror';
+import { codemirror } from 'vue-codemirror';
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/mode/javascript/javascript';
@@ -36,7 +36,7 @@ import Modal from 'iview/src/components/modal';
 import 'iview/dist/styles/iview.css';
 import '../resources/fonts/iconfont.css';
 
-import {ipcRenderer} from 'electron';
+import { ipcRenderer } from 'electron';
 
 
 export default {
@@ -58,7 +58,6 @@ export default {
             },
             showAbout: false,
             logoSrc: require('../../assets/app.png'),
-            
         }
     },
     computed: {
@@ -74,6 +73,21 @@ export default {
                 readOnly: this.activeHost.canEdit === false
             }
         }
+    },
+    mounted() {
+        ipcRenderer.on('applyHostSucceed', (event, args) => {
+            console.log(args, 'hahha');
+        });
+
+        ipcRenderer.on('requireSudoPwd', () => {
+            this.sudoPwdModel = {
+                visible: true
+            }
+        });
+
+        ipcRenderer.on('showAbout', () => {
+            this.showAbout = true;
+        });
     },
     methods: {
         changeSwitch(host) {
@@ -102,7 +116,7 @@ export default {
             } else {
                 lineContent = `# ${lineContent}`;
             }
-            cm.replaceRange(lineContent, {line, ch: 0}, {line});
+            cm.replaceRange(lineContent, { line, ch: 0 }, { line });
         },
         applyCurrentHost() {
             this.activeHost.checked = true;
@@ -120,21 +134,6 @@ export default {
         hideAbout() {
             this.showAbout = false;
         }
-    },
-    mounted() {
-        ipcRenderer.on('applyHostSucceed', (event, args) => {
-            console.log(args, 'hahha');
-        });
-
-        ipcRenderer.on('requireSudoPwd', () => {
-            this.sudoPwdModel = {
-                visible: true
-            }
-        });
-
-        ipcRenderer.on('showAbout', () => {
-            this.showAbout = true;
-        });
     }
 }
 

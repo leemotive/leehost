@@ -9,15 +9,14 @@ Vue.use(VueRouter);
 Vue.prototype.$Message = Message;
 
 import Home from './home';
-const About = {template: '<div>About</div>'};
 
 const routes = [
-    {path: '/', component: Home},
-    {path: '/home', component: Home}
+    { path: '/', component: Home },
+    { path: '/home', component: Home }
 ]
 
-const router = new VueRouter({routes});
+const router = new VueRouter({ routes });
 
-const app = new Vue({
+new Vue({
     router
 }).$mount('#app')

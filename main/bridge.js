@@ -1,18 +1,18 @@
-//import {ipcMain} from 'electron';
-//import fs from 'fs';
-//import os from 'os';
-//import ChildProcess from 'child_process';
+// import {ipcMain} from 'electron';
+// import fs from 'fs';
+// import os from 'os';
+// import ChildProcess from 'child_process';
 
-const {ipcMain} = require('electron');
+const { ipcMain } = require('electron');
 const fs = require('fs');
 const os = require('os');
 const ChildProcess = require('child_process');
 
-const {exec} = ChildProcess;
+const { exec } = ChildProcess;
 
-//import Store from 'electron-store';
+// import Store from 'electron-store';
 const Store = require('electron-store');
-const store = new Store({cwd: 'envConfig'});
+const store = new Store({ cwd: 'envConfig' });
 
 
 
@@ -80,7 +80,7 @@ function calHost() {
     const contents = [];
 
     envlists = envlists.slice(0);
-    let [{content: hostNames}] = envlists.splice(-1, 1);
+    let [{ content: hostNames }] = envlists.splice(-1, 1);
     let nameArr = hostNames.split(os.EOL).filter(name => !/^\s*#/.test(name));
     for(let env of envlists) {
         if (env.showCheck !== false && env.checked !== false) {
