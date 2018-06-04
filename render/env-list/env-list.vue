@@ -190,7 +190,7 @@ export default {
         height: 100%;
         display: flex;
         flex-direction: column;
-        background: #373C47;
+        background: #373c47;
     }
 
     .env-list {
@@ -203,7 +203,7 @@ export default {
             height: 35px;
             line-height: 35px;
             font-size: 16px;
-            color: #979CA7;
+            color: #979ca7;
             cursor: pointer;
 
             .leeicon-edit {
@@ -212,7 +212,7 @@ export default {
             }
 
             &.active {
-                background: #2D3038;
+                background: #2d3038;
                 color: #fff;
             }
 
@@ -222,21 +222,23 @@ export default {
                 }
             }
         }
+
         .op {
             float: right;
             margin-right: 12px;
         }
+
         .env-icon {
             margin: 0 10px 0 15px;
         }
     }
+
     .env-bar {
         bottom: 0;
         cursor: default;
         width: 100%;
         height: 35px;
-        color: #979CA7;
-        height: 35px;
+        color: #979ca7;
         line-height: 35px;
         font-size: 16px;
 
@@ -260,6 +262,7 @@ export default {
             margin-left: 15px;
         }
     }
+
     .host-ip {
         margin-top: 5px;
     }
@@ -270,6 +273,7 @@ export default {
         .delete-btn {
             color: #ed3f14;
             border-color: #ed3f14;
+
             &:hover {
                 border-color: #ed3f14;
             }
@@ -278,7 +282,6 @@ export default {
 </style>
 
 <style lang="postcss">
-
 
 </style>
 

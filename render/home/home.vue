@@ -143,12 +143,13 @@ export default {
 <style lang="postcss" scoped>
     .home {
         display: flex;
-        .side-list{
+
+        .side-list {
             width: 240px;
         }
+
         .host-edit {
             flex: 1;
-
             display: flex;
             flex-direction: column;
 
@@ -156,20 +157,24 @@ export default {
                 flex: 1;
                 overflow: auto;
             }
+
             .operator {
                 height: 45px;
                 line-height: 45px;
                 background: #f3f3f3;
                 text-align: right;
+
                 button {
                     margin-right: 15px;
                 }
+
                 .leefont {
                     font-size: 14px;
                     margin-right: 10px;
                 }
             }
         }
+
         .leeicon-lock {
             position: absolute;
             top: 0;
@@ -181,14 +186,18 @@ export default {
     .sudo-pwd-modal {
         width: 400px;
     }
+
     .ivu-modal-body {
         display: flex;
     }
+
     .sudo-pwd-input {
         margin-left: 15px;
     }
+
     .about {
         text-align: center;
+
         .logo {
             width: 100px;
             height: 100px;
@@ -201,8 +210,10 @@ export default {
             height: 100%;
         }
     }
+
     .sudo-pwd-modal {
         width: 400px;
+
         .ivu-modal-body {
             display: flex;
             line-height: 32px;
