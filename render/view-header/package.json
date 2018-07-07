@@ -1,0 +1,6 @@
+{
+    "name": "view-header",
+    "version": "1.0.0",
+    "description": "环境编辑页面的头部",
+    "main": "view-header.vue"
+  }
