@@ -4,11 +4,15 @@
             env-list(ref="envList" v-on:changeSwitch="changeSwitch")
         .host-edit.full-height
             i.leefont.leeicon-lock(v-if="activeHost.canEdit === false")
+            view-header(:host="activeHost")
             codemirror(v-model="activeHost.content" :options="cmOptions" @gutterClick="onGutterClick")
             .operator(v-if="activeHost.canApply !== false")
-                i-button(type="primary" size="small" @click="applyCurrentHost")
-                    i.leefont.leeicon-check
-                    | {{activateText}}
+                i-button(v-if="activeHost.canEdit !== false" type="info" size="small" @click="sortDomain")
+                    i.leefont.leeicon-sort
+                    | Sort
+                i-button(v-if="activeHost.canEdit !== false" type="primary" size="small" @click="saveCurrentHost")
+                    i.leefont.leeicon-save
+                    | Save
 
         modal(v-model="sudoPwdModel.visible" title="Input your sudo password" @on-ok="inputSudoPwdOk" @on-cancel="inputSudoPwdCancel" width="400" class="sudo-pwd-modal")
             |Password
@@ -17,6 +21,10 @@
             .about
                 img.logo(:src="logoSrc")
                 div LeeHost(1.0.0)
+                div.project-home
+                    i.leefont.leeicon-github
+                    a(href="javascript:;")
+                        span.github-address(@click="goSourceCode") Source Code
             div(slot="footer")
                 i-button(type="ghost" @click="hideAbout") Close
 </template>
@@ -24,11 +32,19 @@
 
 <script>
 import EnvList from '../env-list';
+import ViewHeader from '../view-header';
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/addon/selection/active-line';
 import 'codemirror/addon/edit/matchbrackets';
+import 'codemirror/addon/search/search';
+import 'codemirror/addon/search/searchcursor';
+import 'codemirror/addon/search/jump-to-line';
+import 'codemirror/addon/dialog/dialog'
 import 'codemirror/mode/javascript/javascript';
+import 'codemirror/addon/dialog/dialog.css'
 import 'codemirror/lib/codemirror.css';
+
+import _ from 'lodash';
 
 import IButton from 'iview/src/components/button';
 import IInput from 'iview/src/components/input';
@@ -36,12 +52,13 @@ import Modal from 'iview/src/components/modal';
 import 'iview/dist/styles/iview.css';
 import '../resources/fonts/iconfont.css';
 
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, shell } from 'electron';
 
 
 export default {
     components: {
         EnvList,
+        ViewHeader,
         codemirror,
         IButton,
         IInput,
@@ -56,14 +73,12 @@ export default {
                 visible: false,
                 pwd: ''
             },
+            asc: true,
             showAbout: false,
             logoSrc: require('../../assets/app.png'),
         }
     },
     computed: {
-        activateText() {
-            return this.activeHost.checked ? 'Apply' : 'Activate';
-        },
         cmOptions() {
             return {
                 tabSize: 4,
@@ -75,23 +90,42 @@ export default {
         }
     },
     mounted() {
-        ipcRenderer.on('applyHostSucceed', (event, args) => {
-            console.log(args, 'hahha');
-        });
-
-        ipcRenderer.on('requireSudoPwd', () => {
+        ipcRenderer.on('requireSudoPwd', (event, switchName) => {
             this.sudoPwdModel = {
-                visible: true
-            }
+                visible: true,
+                switchName
+            };
         });
 
         ipcRenderer.on('showAbout', () => {
             this.showAbout = true;
         });
+
+        ipcRenderer.on('importError', () => {
+            this.$Message.error({ content: 'Import Error' });
+        });
+        ipcRenderer.on('importSuccess', () => {
+            this.$Message.success({ content: 'Import Success' });
+        });
+        ipcRenderer.on('noImportFile', () => {
+            this.$Message.warning({ content: 'Please select file path' });
+        });
+        ipcRenderer.on('exportError', () => {
+            this.$Message.error({ content: 'Export Error' });
+        });
+        ipcRenderer.on('exportSuccess', () => {
+            this.$Message.success({ content: 'Export Success' });
+        });
+        ipcRenderer.on('noExportFile', () => {
+            this.$Message.warning({ content: 'Please select file path' });
+        });
     },
     methods: {
+        goSourceCode() {
+            shell.openExternal('https://github.com/leemotive/leehost');
+        },
         changeSwitch(host) {
-            this.activeHost = host;
+            this.activeHost = _.cloneDeep(host);
         },
         onCmReady(cm) {
             console.log(`editor is ready`);
@@ -120,23 +154,46 @@ export default {
         },
         applyCurrentHost() {
             this.activeHost.checked = true;
-            this.$refs.envList.storeEnvList();
+            this.$refs.envList.storeEnvList(this.activeHost);
         },
-
+        saveCurrentHost() {
+            this.$refs.envList.storeEnvList(this.activeHost);
+        },
         inputSudoPwdOk() {
             ipcRenderer.send('sudoPwdApply', {
-                pwd: this.sudoPwdModel.pwd
+                pwd: this.sudoPwdModel.pwd,
+                switchName: this.sudoPwdModel.switchName
             });
         },
         inputSudoPwdCancel() {
             ipcRenderer.send('sudoPwdCancel');
+            if (this.sudoPwdModel.switchName) {
+                this.activeHost.checked = !this.activeHost.checked;
+                this.$refs.envList.storeEnvList(this.activeHost, false);
+            }
+            this.$Message.error({ content: 'Cancelled' })
         },
         hideAbout() {
             this.showAbout = false;
+        },
+        sortDomain() {
+            const { content } = this.activeHost;
+            const domains = content.split(/\r?\n/);
+            this.activeHost.content = domains.sort((a, b) => {
+                const aname = resolveDomain(a);
+                const bname = resolveDomain(b);
+                return this.asc ? aname > bname : aname < bname;
+            }).join('\n');
+            this.asc = !this.asc;
+            this.saveCurrentHost();
         }
     }
 }
 
+function resolveDomain(config) {
+    const matches = config.match(/\s*#*\s*[\d.]*\s+([\w.]+)/);
+    return matches ? matches[1] : config;
+}
 </script>
 
 
@@ -201,6 +258,17 @@ export default {
         .logo {
             width: 100px;
             height: 100px;
+        }
+
+        .project-home {
+            .leeicon-github {
+                vertical-align: middle;
+            }
+
+            .github-address {
+                vertical-align: middle;
+                padding-left: 5px;
+            }
         }
     }
 </style>

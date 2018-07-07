@@ -1,14 +1,31 @@
 <template lang="pug">
     .env-wrap
-        ul.env-list
-            li(v-for="(env, index) in envs" @click="checkHost(env)" :class="{active: env.name === activeName}")
-                i(:class="['env-icon leefont', index === 0 ? 'leeicon-computer' : 'leeicon-file']")
-                span.env-name {{env.name}}
-                span.op(v-if="env.showCheck !== false")
-                    i.leefont.leeicon-edit(v-if="env.isSystem !== true" @click="editEnv(env)")
-                    i-switch(v-model="env.checked" size="small" :disabled="env.canCheck === false")
+        .env-list
+            ul
+                li(v-for="(env, index) in preEnv" @click="checkHost(env)" :class="{active: env.name === activeName}")
+                    i(:class="['env-icon leefont', index === 0 ? 'leeicon-computer' : 'leeicon-file']")
+                    span.env-name {{env.name}}
+                    span.op(v-if="env.showCheck !== false")
+                        i.leefont.leeicon-edit(v-if="env.isSystem !== true" @click="editEnv(env)")
+                        i-switch(v-model="env.checked" size="small" @on-change="envSwitch(env)" :disabled="env.canCheck === false")
+            ul
+                draggable(v-model="userEnv" :options="{name: 'env'}" @end="dragend()")
+                    li(v-for="(env, index) in userEnv" @click="checkHost(env)" :class="{active: env.name === activeName}")
+                        i(:class="['env-icon leefont', 'leeicon-file']")
+                        span.env-name {{env.name}}
+                        span.op(v-if="env.showCheck !== false")
+                            i.leefont.leeicon-edit(v-if="env.isSystem !== true" @click="editEnv(env)")
+                            i-switch(v-model="env.checked" size="small" @on-change="envSwitch(env)" :disabled="env.canCheck === false")
+            ul
+                li(v-for="(env, index) in sufEnv" @click="checkHost(env)" :class="{active: env.name === activeName}")
+                    i(:class="['env-icon leefont', 'leeicon-file']")
+                    span.env-name {{env.name}}
+                    span.op(v-if="env.showCheck !== false")
+                        i.leefont.leeicon-edit(v-if="env.isSystem !== true" @click="editEnv(env)")
+                        i-switch(v-model="env.checked" size="small" @on-change="envSwitch(env)" :disabled="env.canCheck === false")
         .env-bar
             i.leefont.leeicon-plus(@click="addEnv")
+            i.leefont.leeicon-sort(@click="sortEnv")
             span.op
 
         modal(ref="hostModal" v-model="hostModal.visible" width="450" :title="hostModal.title" @on-ok="saveHost" :mask-closable="false" :loading="true")
@@ -36,28 +53,24 @@ import IInput from 'iview/src/components/input';
 import Modal from 'iview/src/components/modal';
 import Checkbox from 'iview/src/components/checkbox';
 import Button from 'iview/src/components/button';
+
+import draggable from 'vuedraggable';
+import _ from 'lodash';
+
 import 'iview/dist/styles/iview.css';
 import '../resources/fonts/iconfont.css';
 
-function storeEnv(envs, tryToApply) {
-    store.set('env-list', envs);
-    ipcRenderer.send('applyHost');
+function storeEnv(envs, { switchEnv, writeSystemHost = true }) {
+    store.set('envList', envs);
+    writeSystemHost && ipcRenderer.send('applyHost', {
+        switchEnvName: switchEnv && switchEnv.name,
+    });
 }
 
-function debounce(fn, delay) {
-    let ti = 0;
-    return function(...args) {
-        clearTimeout(ti);
-        ti = setTimeout(() => {
-            fn.apply(this, args);
-        }, delay);
-    }
-}
-
-const deStore = debounce(storeEnv, 500);
 
 export default {
     components: {
+        draggable,
         ISwitch,
         Modal,
         Checkbox,
@@ -65,43 +78,67 @@ export default {
         Button,
     },
     data() {
-        const envs = store.get('env-list');
+        const envs = store.get('envList');
         envs.unshift({
             name: 'System Hosts',
             showCheck: false,
             canEdit: false,
             canApply: false,
         });
+
         return {
-            envs,
+            preEnv: envs.slice(0, 2),
+            userEnv: envs.slice(2, -2),
+            sufEnv: envs.slice(-2),
+            asc: true,
             activeName: 'System Hosts',
             hostModal: {
                 visible: false,
             }
         }
     },
-    watch: {
-        envs: {
-            handler(val) {
-                this.storeEnvList({ val });
-            },
-            deep: true
-        }
-
-    },
     mounted() {
-        this.$emit('changeSwitch', this.envs[0]);
+        this.$emit('changeSwitch', this.preEnv[0]);
 
-        const content = ipcRenderer.sendSync('callSystemHost');
-        this.envs[0].content = content;
+        ipcRenderer.send('callSystemHost');
+        ipcRenderer.on('currentSystemHost', (event, data) => {
+            console.log(data);
+            this.preEnv[0].content = data;
+            this.$emit('changeSwitch', this.preEnv[0]);
+        });
+        ipcRenderer.on('callSystemHostError', (event, data) => {
+            this.$Message.error({ content: 'Read System Host File Error' });
+        });
+
 
         ipcRenderer.on('applyHostSucceed', (event, args) => {
-            this.envs[0].content = args;
+            this.preEnv[0].content = args;
+            this.$Message.success({ content: 'Succeeded' })
+        });
+        ipcRenderer.on('addNewEnv', (envent, args) => {
+            this.addEnv();
         });
     },
     methods: {
-        storeEnvList({ val = this.envs } = {}) {
-            deStore(val.slice(1));
+        envSwitch(env) {
+            storeEnv([...this.preEnv.slice(1), ...this.userEnv, ...this.sufEnv], { switchEnv: env });
+        },
+        dragend() {
+            storeEnv([...this.preEnv.slice(1), ...this.userEnv, ...this.sufEnv]);
+        },
+        storeEnvList(env, writeSystemHost = true) {
+            const allEnv = [...this.preEnv.slice(1), ...this.userEnv, ...this.sufEnv];
+            if (!env) {
+                storeEnv(allEnv);
+            } else if (env.name) {
+                const index = allEnv.findIndex(c => c.name === env.name);
+                if (~index) {
+                    allEnv.splice(index, 1, _.merge(allEnv[index], env));
+                    storeEnv(allEnv, { writeSystemHost });
+                }
+            } else {
+                storeEnv(env, { writeSystemHost });
+            }
         },
         checkHost(env) {
             this.activeName = env.name;
@@ -118,6 +155,15 @@ export default {
                 originalName: env.name
             };
         },
+        sortEnv() {
+            this.userEnv = this.userEnv.sort((a, b) => {
+                const aname = a.name.toLowerCase();
+                const bname = b.name.toLowerCase();
+                return this.asc ? aname > bname : aname < bname;
+            });
+            this.asc = !this.asc;
+            this.storeEnvList();
+        },
         addEnv() {
             this.hostModal = {
                 visible: true,
@@ -130,8 +176,9 @@ export default {
         },
         saveHost() {
             this.$refs.hostModal.buttonLoading = false;
+            const allEnv = [...this.preEnv, ...this.userEnv, ...this.sufEnv];
             if (this.hostModal.editMode) {
-                let [env1, env2] = this.envs.filter(({ name }) => name === this.hostModal.name || name === this.hostModal.originalName);
+                let [env1, env2] = allEnv.filter(({ name }) => name === this.hostModal.name || name === this.hostModal.originalName);
                 if (env2) {
                     this.$Message.error({
                         content: `${this.hostModal.name}已经存在，名字不可重复`,
@@ -146,23 +193,18 @@ export default {
                     this.hostModal = {
                         visible: false,
                     };
-                    this.storeEnvList();
+                    this.storeEnvList(allEnv.slice(1));
                 }
             } else {
-                const env = this.envs.find(({ name }) => name === this.hostModal.name);
+                const env = allEnv.find(({ name }) => name === this.hostModal.name);
                 if (env) {
                     this.$Message.error({
                         content: `${this.hostModal.name}已经存在，名字不可重复`,
                         duration: 3
                     });
                 } else {
-                    let content = `# ${this.hostModal.name}`;
-                    if (this.hostModal.extendNames) {
-                        content = `${content}
-# ${this.hostModal.ip} extends from Host Names
-`
-                    }
-                    this.envs.splice(-2, 0, {
+                    let content = '';
+                    allEnv.splice(-2, 0, {
                         name: this.hostModal.name,
                         ip: this.hostModal.ip,
                         extendNames: this.hostModal.extendNames,
@@ -171,12 +213,12 @@ export default {
                     this.hostModal = {
                         visible: false,
                     };
-                    this.storeEnvList();
+                    this.storeEnvList(allEnv.slice(1));
                 }
             }
         },
         deleteHost() {
-            this.envs = this.envs.filter(({ name }) => name !== this.hostModal.name);
+            this.sufEnv = this.sufEnv.filter(({ name }) => name !== this.hostModal.name);
             this.hostModal = {
                 visible: false
             };
@@ -241,14 +283,16 @@ export default {
         color: #979ca7;
         line-height: 35px;
         font-size: 16px;
+        padding: 0 12px 0 15px;
+
+        .leefont {
+            cursor: pointer;
+            margin-right: 10px;
+        }
 
         .op {
             float: right;
             margin-right: 12px;
-        }
-
-        .leeicon-plus {
-            margin: 0 10px 0 15px;
         }
     }
 

@@ -1,20 +1,14 @@
-// import {app, BrowserWindow} from 'electron';
-// import path from 'path';
-// import url from 'url';
-// import fs from 'fs';
-
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const url = require('url');
-const fs = require('fs');
 
-// import Store from 'electron-store';
-const Store = require('electron-store');
-const store = new Store({ cwd: 'envConfig' });
 
-// import './bridge';
-require('./bridge');
+const bridge = require('./bridge');
+require('./event');
+const menu = require('./menu');
+const ImExport = require('./imexport');
 
+const host = require('./host');
 
 let win;
 function createWindow() {
@@ -28,11 +22,14 @@ function createWindow() {
     win.on('closed', () => {
         win = null;
     });
+
+    bridge.registerSender(win.webContents);
 }
 
 app.on('ready', () => {
     createWindow();
-    initMenu();
+    ImExport.init(app);
+    menu.initMenu();
 });
 
 
@@ -48,73 +45,5 @@ app.on('activate', () => {
     }
 });
 
-{
-    if(!store.get('env-list')) {
-        fs.readFile('/etc/hosts', 'utf8', (err, data) => {
-            if (err) {
 
-            }
-            store.set('env-list', [{
-                name: 'COMMON',
-                checked: true,
-                content: `# COMMON`,
-                isSystem: true,
-                canDelete: false
-            }, {
-                name: 'My hosts',
-                checked: true,
-                content: `# My hosts
-${data}`
-            }, {
-                name: 'backup',
-                checked: false,
-                canEdit: false,
-                canDelete: false,
-                isSystem: true,
-                content: `# backup
-${data}`,
-            }, {
-                name: 'Host Names',
-                showCheck: false,
-                canDelete: false,
-                checked: true,
-                isSystem: true,
-                content: `# Host Names`
-            }]);
-        })
-    }
-}
-
-
-const template = [{
-    label: 'LeeHost',
-    submenu: [{
-        label: 'About',
-        click: () => {
-            win.webContents.send('showAbout');
-        }
-    }]
-}, {
-    label: 'Edit',
-    submenu: [{
-        label: 'Cut',
-        role: 'cut'
-    }, {
-        label: 'Copy',
-        role: 'copy'
-    }, {
-        label: 'Paste',
-        role: 'paste'
-    }, {
-        label: 'Select All',
-        role: 'selectall'
-    }/* , {
-        label: 'DevTool',
-        role: 'toggledevtools'
-    } */]
-}];
-
-function initMenu() {
-    const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
-}
+host.tryToBackUp();

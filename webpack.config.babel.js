@@ -30,6 +30,9 @@ let webpackConfig = {
                     options: {
                         presets: [
                             ['@babel/preset-env']
+                        ],
+                        plugins: [
+                            require('@babel/plugin-proposal-object-rest-spread')
                         ]
                     }
                 }
@@ -46,17 +49,17 @@ let webpackConfig = {
             {
                 test: /\.css/,
                 use: [
-                    {loader: 'style-loader'},
-                    {loader: 'css-loader', options: {importLoader: 1}},
-                    {loader: 'postcss-loader', options: {
+                    { loader: 'style-loader' },
+                    { loader: 'css-loader', options: { importLoader: 1 } },
+                    { loader: 'postcss-loader', options: {
                         plugins: (loader) => postcssConfig
-                    }}
+                    } }
                 ]
             },
             {
-                test: /\.(png|jpg|gif|jpeg|eot|svg|ttf|woff)/,
+                test: /\.(png|jpg|gif|jpeg|eot|svg|ttf|woff|icns|ico)/,
                 use: [
-                    {loader: 'file-loader', options: {name: '[path][name].[ext]', context: `./render`}}
+                    { loader: 'file-loader', options: { name: '[path][name].[ext]', context: `./render` } }
                 ]
             }
         ]

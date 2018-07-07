@@ -2,10 +2,5 @@
   "name": "home",
   "version": "1.0.0",
   "description": "首页",
-  "main": "home.vue",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "wstation@163.com",
-  "license": "ISC"
+  "main": "home.vue"
 }
