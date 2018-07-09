@@ -44,6 +44,8 @@ import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/dialog/dialog.css'
 import 'codemirror/lib/codemirror.css';
 
+import aboutAppLogo from '../../assets/app.png'
+
 import _ from 'lodash';
 
 import IButton from 'iview/src/components/button';
@@ -75,7 +77,7 @@ export default {
             },
             asc: true,
             showAbout: false,
-            logoSrc: require('../../assets/app.png'),
+            logoSrc: aboutAppLogo,
         }
     },
     computed: {
@@ -202,6 +204,7 @@ function resolveDomain(config) {
         display: flex;
 
         .side-list {
+            min-width: 240px;
             width: 240px;
         }
 

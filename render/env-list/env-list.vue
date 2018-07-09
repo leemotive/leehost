@@ -129,7 +129,7 @@ export default {
         storeEnvList(env, writeSystemHost = true) {
             const allEnv = [...this.preEnv.slice(1), ...this.userEnv, ...this.sufEnv];
             if (!env) {
-                storeEnv(allEnv);
+                storeEnv(allEnv, { writeSystemHost });
             } else if (env.name) {
                 const index = allEnv.findIndex(c => c.name === env.name);
                 if (~index) {
@@ -204,12 +204,14 @@ export default {
                     });
                 } else {
                     let content = '';
-                    allEnv.splice(-2, 0, {
+                    const newEnv = {
                         name: this.hostModal.name,
                         ip: this.hostModal.ip,
                         extendNames: this.hostModal.extendNames,
                         content
-                    });
+                    };
+                    allEnv.splice(-2, 0, newEnv);
+                    this.userEnv.push(newEnv);
                     this.hostModal = {
                         visible: false,
                     };
