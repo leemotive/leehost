@@ -90,29 +90,27 @@ const tryToBackUp = () => {
             store.set('envList', [{
                 name: 'COMMON',
                 checked: true,
-                content: `# COMMON`,
+                content: ``,
                 isSystem: true,
                 canDelete: false
             }, {
                 name: 'My hosts',
                 checked: true,
-                content: `# My hosts
-${data}`
+                content: `${data}`
             }, {
                 name: 'backup',
                 checked: false,
                 canEdit: false,
                 canDelete: false,
                 isSystem: true,
-                content: `# backup
-${data}`,
+                content: `${data}`,
             }, {
                 name: 'Host Names',
                 showCheck: false,
                 canDelete: false,
                 checked: true,
                 isSystem: true,
-                content: `# Host Names`
+                content: ``
             }]);
         })
     }
