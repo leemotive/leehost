@@ -220,10 +220,11 @@ export default {
             }
         },
         deleteHost() {
-            this.sufEnv = this.sufEnv.filter(({ name }) => name !== this.hostModal.name);
+            this.userEnv = this.userEnv.filter(({ name }) => name !== this.hostModal.name);
             this.hostModal = {
                 visible: false
             };
+            this.storeEnvList();
         }
     }
 }
