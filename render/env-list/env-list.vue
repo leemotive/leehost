@@ -60,7 +60,7 @@ import _ from 'lodash';
 import 'iview/dist/styles/iview.css';
 import '../resources/fonts/iconfont.css';
 
-function storeEnv(envs, { switchEnv, writeSystemHost = true }) {
+function storeEnv(envs, { switchEnv, writeSystemHost = true } = {}) {
     store.set('envList', envs);
     writeSystemHost && ipcRenderer.send('applyHost', {
         switchEnvName: switchEnv && switchEnv.name,
