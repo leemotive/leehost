@@ -194,6 +194,7 @@ export default {
                         visible: false,
                     };
                     this.storeEnvList(allEnv.slice(1));
+                    this.$emit('changeSwitch', env1);
                 }
             } else {
                 const env = allEnv.find(({ name }) => name === this.hostModal.name);
