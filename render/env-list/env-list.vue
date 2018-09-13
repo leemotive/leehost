@@ -159,7 +159,7 @@ export default {
             this.userEnv = this.userEnv.sort((a, b) => {
                 const aname = a.name.toLowerCase();
                 const bname = b.name.toLowerCase();
-                return this.asc ? aname > bname : aname < bname;
+                return Math.sign(+(this.asc ? aname > bname : aname < bname) - 0.5);
             });
             this.asc = !this.asc;
             this.storeEnvList();

@@ -184,7 +184,7 @@ export default {
             this.activeHost.content = domains.sort((a, b) => {
                 const aname = resolveDomain(a);
                 const bname = resolveDomain(b);
-                return this.asc ? aname > bname : aname < bname;
+                return Math.sign(+(this.asc ? aname > bname : aname < bname) - 0.5);
             }).join('\n');
             this.asc = !this.asc;
             this.saveCurrentHost();
