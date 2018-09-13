@@ -97,7 +97,6 @@ const versionImport = {
             const newDomains = [];
             const domains = item.content.split(/\r?\n/);
             for(let domain of domains) {
-                console.log(domain);
                 if (!domain) {
                     continue;
                 }
@@ -107,11 +106,9 @@ const versionImport = {
                 if (domain.includes('extends from Host Names')) {
                     continue;
                 }
-                console.log('push');
                 newDomains.push(domain);
             }
             item.content = newDomains.join(os.EOL);
-            console.log(item.content);
             return item;
         });
         return { envList: newEnvList };

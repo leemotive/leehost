@@ -2,13 +2,14 @@ const { Menu, shell } = require('electron');
 const ImExport = require('./imexport');
 
 const bridge = require('./bridge');
+const version = require('../package.json').version
 
 const template = [{
     label: 'LeeHost',
     submenu: [{
         label: 'About',
         click: () => {
-            bridge.broadcast('showAbout');
+            bridge.broadcast('showAbout', version);
         }
     }, {
         type: 'separator'

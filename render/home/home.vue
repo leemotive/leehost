@@ -20,7 +20,7 @@
         modal(v-model="showAbout" v-bind:closable="false" width="250")
             .about
                 img.logo(:src="logoSrc")
-                div LeeHost(1.0.0)
+                div LeeHost({{version}})
                 div.project-home
                     i.leefont.leeicon-github
                     a(href="javascript:;")
@@ -78,6 +78,7 @@ export default {
             asc: true,
             showAbout: false,
             logoSrc: aboutAppLogo,
+            version: '',
         }
     },
     computed: {
@@ -99,8 +100,9 @@ export default {
             };
         });
 
-        ipcRenderer.on('showAbout', () => {
+        ipcRenderer.on('showAbout', (event, version) => {
             this.showAbout = true;
+            this.version = version;
         });
 
         ipcRenderer.on('importError', () => {
@@ -130,10 +132,8 @@ export default {
             this.activeHost = _.cloneDeep(host);
         },
         onCmReady(cm) {
-            console.log(`editor is ready`);
         },
         onCmCodeChange(newCode) {
-            console.log(newCode);
         },
         onGutterClick(cm, line) {
             if (this.activeHost.canEdit === false) {

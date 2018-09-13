@@ -102,7 +102,6 @@ export default {
 
         ipcRenderer.send('callSystemHost');
         ipcRenderer.on('currentSystemHost', (event, data) => {
-            console.log(data);
             this.preEnv[0].content = data;
             this.$emit('changeSwitch', this.preEnv[0]);
         });

@@ -1,6 +1,6 @@
 {
   "name": "leehost",
-  "version": "1.1.0",
+  "version": "1.1.5",
   "description": "host管理软件",
   "main": "app.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "dev": "webpack --mode development",
     "start": "electron .",
     "build": "webpack --mode production",
-    "package": "electron-packager ./ --out=package --platform=darwin --arch=x64 --overwrite --asar=true --prune  --icon=./assets/app.icns --ignore=node_modules/.bin --ignore=.git --app-version=1.0.0 --build-version=2563",
+    "package": "electron-packager ./ --out=package --platform=darwin --arch=x64 --overwrite --asar=true --prune  --icon=./assets/app.icns --ignore=node_modules/.bin --ignore=.git --app-version=1.1.5 --build-version=2563",
     "precommit": "lint-staged"
   },
   "lint-staged": {
